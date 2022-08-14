@@ -74,9 +74,8 @@ docs/_build/
 # PyBuilder
 target/
 
-# Jupyter Notebook (check in Jupytext-generated Markdown instead of notebooks)
+# Jupyter Notebook
 .ipynb_checkpoints
-.ipynb
 
 # IPython
 profile_default/
