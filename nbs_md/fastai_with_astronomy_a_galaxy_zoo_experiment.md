@@ -155,7 +155,7 @@ im = Image.open(dest)
 im.to_thumb(256,256)
 ```
 
-```python id="OTOf3lRh_zdh"
+```python pycharm={"name": "#%%\n"}
 searches = 'forest','bird'
 path = Path('bird_or_not')
 
@@ -164,20 +164,6 @@ for o in searches:
     dest.mkdir(exist_ok=True, parents=True)
     download_images(dest, urls=search_images(f'{o} photo'))
     resize_images(path/o, max_size=400, dest=path/o)
-```
-
-<!-- #region id="M2mYteIj_zdi" -->
-## Step 2: Train our model
-<!-- #endregion -->
-
-<!-- #region id="80DToSnK_zdi" -->
-Some photos might not download correctly which could cause our model training to fail, so we'll remove them:
-<!-- #endregion -->
-
-```python id="rjAY8nwe_zdi"
-failed = verify_images(get_image_files(path))
-failed.map(Path.unlink)
-len(failed)
 ```
 
 <!-- #region id="jhpS0rCG_zdi" -->
