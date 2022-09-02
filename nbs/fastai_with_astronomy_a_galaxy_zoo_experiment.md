@@ -8,7 +8,7 @@ This notebook is an adaptation of the first [lesson](https://www.youtube.com/wat
 
 In addition, this notebook also contains my thoughts and observations from the first lesson of the course and the first chapter of the book [Deep Learning for Coders with Fastai and Pytorch: AI Applications Without a PhD - Chapter 1](https://colab.research.google.com/github/fastai/fastbook/blob/master/01_intro.ipynb).
 
-## Requirements
+## Step 0: Fulfill requirements
 
 If we are running this notebook on Kaggle, the following code snippet will check if our notebook server has internet access. Access to internet is required in order to install packages via `pip` or `conda`. On Google Colab, internet access is enabled by default.
 
@@ -72,7 +72,7 @@ else:
 
 *Customisation*: When running this notebook on Google Colab and in Google Chrome, we can change the font type of the Markdown text as well as code by typing the URL (`chrome://settings/fonts`) in a tab and modifying the *Standard* and *Fixed-width* font.
 
-## Data
+## Step 1: Understand and prepare data
 
 In this notebook, we will build a classifier to label galaxy images provided as part of the Kaggle competition [Galaxy Zoo - The Galaxy Challenge](https://www.kaggle.com/competitions/galaxy-zoo-the-galaxy-challenge/overview). In order to use this data for classification in Google Colab, we need to perform the following steps:
 1. Download the data from the *Data* tab of this page in ZIP format. 
@@ -96,6 +96,9 @@ root_dir = "/content/gdrive/My Drive/Colab Notebooks/fastai_2022/data/galaxy-zoo
 sys.path.append(root_dir)
 ```
 
+    Mounted at /content/gdrive
+
+
 Let us now do a quick check to ensure that we are able to access the contents of this directory in the notebook.
 
 
@@ -104,7 +107,19 @@ import os
 os.listdir(root_dir)
 ```
 
-*Galaxy Zoo - The Galaxy Challenge* was a ML competition held on Kaggle about 8 years ago. The aim for competitors is to build a ML model/algorithm that can correctly assign various labels to `JPG` images of galaxies. 
+
+
+
+    ['images_test_rev1',
+     'images_training_rev1',
+     'central_pixel_benchmark.csv',
+     'all_ones_benchmark.csv',
+     'all_zeros_benchmark.csv',
+     'training_solutions_rev1.csv']
+
+
+
+*Galaxy Zoo - The Galaxy Challenge* was a ML competition held on Kaggle about 8 years ago. The aim for competitors was to build a ML model/algorithm that can correctly assign various labels to `JPG` images of galaxies. 
 
 The data for this competition was collected as part of a citizen science effort in which hundred of thousands of volunteers looked at images of galaxies and provided their answers to various questions. These same images will be available to our model/algorithm for training.
 
@@ -191,19 +206,1150 @@ Thus, besides the responses for the first question, we do not expect the sum of 
 
 The outputs are in the file `training_solutions_rev1.csv`. The first column is `Galaxy ID` which uniquely determines each image. The rest of the columns provide the density of each of the responses with values lying between 0 and 1 (inclusive). These densities are *related* to the probability of each response. Our model should be able to learn from the training set and then estimate these densities for a new image of a galaxy.
 
-Dummy text cell. Adding another dummy line.
+Images to train a model are placed in the directory `images_training_rev1` whereas images to ascertain model performance are available in the directory `images_training_rev1`. Image file names are the same as the `Galaxy ID` specified in the CSV file. 
+
+Before we build a model, we need to load the data in a format that the fastai models understand. fastai's [DataBlock API](https://docs.fast.ai/50_tutorial.datablock.html) helps us create such a data structure. To create it, let us load the requisite packages and then load the CSV file `training_solutions_rev1.csv`.
 
 
 ```python
-searches = 'forest','bird'
-path = Path('bird_or_not')
+from typing import Optional, Union
 
-for o in searches:
-    dest = (path/o)
-    dest.mkdir(exist_ok=True, parents=True)
-    download_images(dest, urls=search_images(f'{o} photo'))
-    resize_images(path/o, max_size=400, dest=path/o)
+from fastai.data.all import *
+from fastai.vision.all import *
+from fastcore.foundation import L
+import pandas as pd
 ```
+
+
+```python
+training_labels_fname: str = "training_solutions_rev1.csv"
+```
+
+
+```python
+training_labels: pd.DataFrame = pd.read_csv(os.path.join(root_dir, training_labels_fname))
+training_labels.head()
+```
+
+
+
+
+
+  <div id="df-ee86f251-78bb-408a-9099-7528f7331b98">
+    <div class="colab-df-container">
+      <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>GalaxyID</th>
+      <th>Class1.1</th>
+      <th>Class1.2</th>
+      <th>Class1.3</th>
+      <th>Class2.1</th>
+      <th>Class2.2</th>
+      <th>Class3.1</th>
+      <th>Class3.2</th>
+      <th>Class4.1</th>
+      <th>Class4.2</th>
+      <th>...</th>
+      <th>Class9.3</th>
+      <th>Class10.1</th>
+      <th>Class10.2</th>
+      <th>Class10.3</th>
+      <th>Class11.1</th>
+      <th>Class11.2</th>
+      <th>Class11.3</th>
+      <th>Class11.4</th>
+      <th>Class11.5</th>
+      <th>Class11.6</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>100008</td>
+      <td>0.383147</td>
+      <td>0.616853</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.616853</td>
+      <td>0.038452</td>
+      <td>0.578401</td>
+      <td>0.418398</td>
+      <td>0.198455</td>
+      <td>...</td>
+      <td>0.000000</td>
+      <td>0.279952</td>
+      <td>0.138445</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.092886</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.325512</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>100023</td>
+      <td>0.327001</td>
+      <td>0.663777</td>
+      <td>0.009222</td>
+      <td>0.031178</td>
+      <td>0.632599</td>
+      <td>0.467370</td>
+      <td>0.165229</td>
+      <td>0.591328</td>
+      <td>0.041271</td>
+      <td>...</td>
+      <td>0.018764</td>
+      <td>0.000000</td>
+      <td>0.131378</td>
+      <td>0.459950</td>
+      <td>0.000000</td>
+      <td>0.591328</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>100053</td>
+      <td>0.765717</td>
+      <td>0.177352</td>
+      <td>0.056931</td>
+      <td>0.000000</td>
+      <td>0.177352</td>
+      <td>0.000000</td>
+      <td>0.177352</td>
+      <td>0.000000</td>
+      <td>0.177352</td>
+      <td>...</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>100078</td>
+      <td>0.693377</td>
+      <td>0.238564</td>
+      <td>0.068059</td>
+      <td>0.000000</td>
+      <td>0.238564</td>
+      <td>0.109493</td>
+      <td>0.129071</td>
+      <td>0.189098</td>
+      <td>0.049466</td>
+      <td>...</td>
+      <td>0.000000</td>
+      <td>0.094549</td>
+      <td>0.000000</td>
+      <td>0.094549</td>
+      <td>0.189098</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>100090</td>
+      <td>0.933839</td>
+      <td>0.000000</td>
+      <td>0.066161</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>...</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 38 columns</p>
+</div>
+      <button class="colab-df-convert" onclick="convertToInteractive('df-ee86f251-78bb-408a-9099-7528f7331b98')"
+              title="Convert this dataframe to an interactive table."
+              style="display:none;">
+
+  <svg xmlns="http://www.w3.org/2000/svg" height="24px"viewBox="0 0 24 24"
+       width="24px">
+    <path d="M0 0h24v24H0V0z" fill="none"/>
+    <path d="M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z"/><path d="M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z"/>
+  </svg>
+      </button>
+
+  <style>
+    .colab-df-container {
+      display:flex;
+      flex-wrap:wrap;
+      gap: 12px;
+    }
+
+    .colab-df-convert {
+      background-color: #E8F0FE;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      fill: #1967D2;
+      height: 32px;
+      padding: 0 0 0 0;
+      width: 32px;
+    }
+
+    .colab-df-convert:hover {
+      background-color: #E2EBFA;
+      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);
+      fill: #174EA6;
+    }
+
+    [theme=dark] .colab-df-convert {
+      background-color: #3B4455;
+      fill: #D2E3FC;
+    }
+
+    [theme=dark] .colab-df-convert:hover {
+      background-color: #434B5C;
+      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));
+      fill: #FFFFFF;
+    }
+  </style>
+
+      <script>
+        const buttonEl =
+          document.querySelector('#df-ee86f251-78bb-408a-9099-7528f7331b98 button.colab-df-convert');
+        buttonEl.style.display =
+          google.colab.kernel.accessAllowed ? 'block' : 'none';
+
+        async function convertToInteractive(key) {
+          const element = document.querySelector('#df-ee86f251-78bb-408a-9099-7528f7331b98');
+          const dataTable =
+            await google.colab.kernel.invokeFunction('convertToInteractive',
+                                                     [key], {});
+          if (!dataTable) return;
+
+          const docLinkHtml = 'Like what you see? Visit the ' +
+            '<a target="_blank" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'
+            + ' to learn more about interactive tables.';
+          element.innerHTML = '';
+          dataTable['output_type'] = 'display_data';
+          await google.colab.output.renderOutput(dataTable, element);
+          const docLink = document.createElement('div');
+          docLink.innerHTML = docLinkHtml;
+          element.appendChild(docLink);
+        }
+      </script>
+    </div>
+  </div>
+
+
+
+
+We know that the image files have `.jpg` extension and their names are the same as `GalaxyID`. So, let us create a new column `image_fname` from `GalaxyID` and drop the latter.
+
+
+```python
+image_fn_col: str = "image_fname"
+training_labels.loc[:, image_fn_col] = training_labels.loc[:, "GalaxyID"].apply(lambda x: f"{x}.jpg")
+training_labels = training_labels.drop(["GalaxyID"], axis=1)
+training_labels.head()
+```
+
+
+
+
+
+  <div id="df-2b978b44-a477-4906-9c26-9938f7614763">
+    <div class="colab-df-container">
+      <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Class1.1</th>
+      <th>Class1.2</th>
+      <th>Class1.3</th>
+      <th>Class2.1</th>
+      <th>Class2.2</th>
+      <th>Class3.1</th>
+      <th>Class3.2</th>
+      <th>Class4.1</th>
+      <th>Class4.2</th>
+      <th>Class5.1</th>
+      <th>...</th>
+      <th>Class10.1</th>
+      <th>Class10.2</th>
+      <th>Class10.3</th>
+      <th>Class11.1</th>
+      <th>Class11.2</th>
+      <th>Class11.3</th>
+      <th>Class11.4</th>
+      <th>Class11.5</th>
+      <th>Class11.6</th>
+      <th>image_fname</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.383147</td>
+      <td>0.616853</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.616853</td>
+      <td>0.038452</td>
+      <td>0.578401</td>
+      <td>0.418398</td>
+      <td>0.198455</td>
+      <td>0.0</td>
+      <td>...</td>
+      <td>0.279952</td>
+      <td>0.138445</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.092886</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.325512</td>
+      <td>100008.jpg</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.327001</td>
+      <td>0.663777</td>
+      <td>0.009222</td>
+      <td>0.031178</td>
+      <td>0.632599</td>
+      <td>0.467370</td>
+      <td>0.165229</td>
+      <td>0.591328</td>
+      <td>0.041271</td>
+      <td>0.0</td>
+      <td>...</td>
+      <td>0.000000</td>
+      <td>0.131378</td>
+      <td>0.459950</td>
+      <td>0.000000</td>
+      <td>0.591328</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>100023.jpg</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.765717</td>
+      <td>0.177352</td>
+      <td>0.056931</td>
+      <td>0.000000</td>
+      <td>0.177352</td>
+      <td>0.000000</td>
+      <td>0.177352</td>
+      <td>0.000000</td>
+      <td>0.177352</td>
+      <td>0.0</td>
+      <td>...</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>100053.jpg</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.693377</td>
+      <td>0.238564</td>
+      <td>0.068059</td>
+      <td>0.000000</td>
+      <td>0.238564</td>
+      <td>0.109493</td>
+      <td>0.129071</td>
+      <td>0.189098</td>
+      <td>0.049466</td>
+      <td>0.0</td>
+      <td>...</td>
+      <td>0.094549</td>
+      <td>0.000000</td>
+      <td>0.094549</td>
+      <td>0.189098</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>100078.jpg</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.933839</td>
+      <td>0.000000</td>
+      <td>0.066161</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>...</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>100090.jpg</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 38 columns</p>
+</div>
+      <button class="colab-df-convert" onclick="convertToInteractive('df-2b978b44-a477-4906-9c26-9938f7614763')"
+              title="Convert this dataframe to an interactive table."
+              style="display:none;">
+
+  <svg xmlns="http://www.w3.org/2000/svg" height="24px"viewBox="0 0 24 24"
+       width="24px">
+    <path d="M0 0h24v24H0V0z" fill="none"/>
+    <path d="M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z"/><path d="M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z"/>
+  </svg>
+      </button>
+
+  <style>
+    .colab-df-container {
+      display:flex;
+      flex-wrap:wrap;
+      gap: 12px;
+    }
+
+    .colab-df-convert {
+      background-color: #E8F0FE;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      fill: #1967D2;
+      height: 32px;
+      padding: 0 0 0 0;
+      width: 32px;
+    }
+
+    .colab-df-convert:hover {
+      background-color: #E2EBFA;
+      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);
+      fill: #174EA6;
+    }
+
+    [theme=dark] .colab-df-convert {
+      background-color: #3B4455;
+      fill: #D2E3FC;
+    }
+
+    [theme=dark] .colab-df-convert:hover {
+      background-color: #434B5C;
+      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));
+      fill: #FFFFFF;
+    }
+  </style>
+
+      <script>
+        const buttonEl =
+          document.querySelector('#df-2b978b44-a477-4906-9c26-9938f7614763 button.colab-df-convert');
+        buttonEl.style.display =
+          google.colab.kernel.accessAllowed ? 'block' : 'none';
+
+        async function convertToInteractive(key) {
+          const element = document.querySelector('#df-2b978b44-a477-4906-9c26-9938f7614763');
+          const dataTable =
+            await google.colab.kernel.invokeFunction('convertToInteractive',
+                                                     [key], {});
+          if (!dataTable) return;
+
+          const docLinkHtml = 'Like what you see? Visit the ' +
+            '<a target="_blank" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'
+            + ' to learn more about interactive tables.';
+          element.innerHTML = '';
+          dataTable['output_type'] = 'display_data';
+          await google.colab.output.renderOutput(dataTable, element);
+          const docLink = document.createElement('div');
+          docLink.innerHTML = docLinkHtml;
+          element.appendChild(docLink);
+        }
+      </script>
+    </div>
+  </div>
+
+
+
+
+The column names are not intuitive and we need to always refer to class description in order to recollect its significance. So, let us rename the columns to names that we can easily associate with as well as put the `image_fname` column at the beginning.
+
+
+```python
+column_name_mapping: dict = {
+    "Class1.1": "smooth_galaxy",
+    "Class1.2": "feature_disk_galaxy_star",
+    "Class1.3": "star",
+    "Class2.1": "edge_on_yes",
+    "Class2.2": "edge_on_no",
+    "Class3.1": "bar_yes",
+    "Class3.2": "bar_no",
+    "Class4.1": "spiral_yes",
+    "Class4.2": "spiral_no",
+    "Class5.1": "no_bulge",
+    "Class5.2": "noticeable_bulge",
+    "Class5.3": "obvious_bulge",
+    "Class5.4": "dominant_bulge",
+    "Class6.1": "something_odd_yes",
+    "Class6.2": "something_odd_no",
+    "Class7.1": "round",
+    "Class7.2": "in_between",
+    "Class7.3": "cigar",
+    "Class8.1": "ring",
+    "Class8.2": "lens_arc",
+    "Class8.3": "disturbed",
+    "Class8.4": "irregular",
+    "Class8.5": "other",
+    "Class8.6": "merger",
+    "Class8.7": "dust_lane",
+    "Class9.1": "edge_on_rounded_bulge",
+    "Class9.2": "edge_on_boxy_bulge",
+    "Class9.3": "edge_on_no_bulge",
+    "Class10.1": "tight_spiral_arms",
+    "Class10.2": "medium_spiral_arms",
+    "Class10.3": "loose_spiral_arms",
+    "Class11.1": "num_arms_1",
+    "Class11.2": "num_arms_2",
+    "Class11.3": "num_arms_3",
+    "Class11.4": "num_arms_4",
+    "Class11.5": "num_arms_gt_4",
+    "Class11.6": "num_arms_cant_tell"
+}
+```
+
+
+```python
+training_labels = training_labels.rename(columns=column_name_mapping)
+training_labels.head()
+```
+
+
+
+
+
+  <div id="df-4a4b9507-68c0-4f86-b49e-cfe5e30efe98">
+    <div class="colab-df-container">
+      <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>smooth_galaxy</th>
+      <th>feature_disk_galaxy_star</th>
+      <th>star</th>
+      <th>edge_on_yes</th>
+      <th>edge_on_no</th>
+      <th>bar_yes</th>
+      <th>bar_no</th>
+      <th>spiral_yes</th>
+      <th>spiral_no</th>
+      <th>no_bulge</th>
+      <th>...</th>
+      <th>tight_spiral_arms</th>
+      <th>medium_spiral_arms</th>
+      <th>loose_spiral_arms</th>
+      <th>num_arms_1</th>
+      <th>num_arms_2</th>
+      <th>num_arms_3</th>
+      <th>num_arms_4</th>
+      <th>num_arms_gt_4</th>
+      <th>num_arms_cant_tell</th>
+      <th>image_fname</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.383147</td>
+      <td>0.616853</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.616853</td>
+      <td>0.038452</td>
+      <td>0.578401</td>
+      <td>0.418398</td>
+      <td>0.198455</td>
+      <td>0.0</td>
+      <td>...</td>
+      <td>0.279952</td>
+      <td>0.138445</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.092886</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.325512</td>
+      <td>100008.jpg</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.327001</td>
+      <td>0.663777</td>
+      <td>0.009222</td>
+      <td>0.031178</td>
+      <td>0.632599</td>
+      <td>0.467370</td>
+      <td>0.165229</td>
+      <td>0.591328</td>
+      <td>0.041271</td>
+      <td>0.0</td>
+      <td>...</td>
+      <td>0.000000</td>
+      <td>0.131378</td>
+      <td>0.459950</td>
+      <td>0.000000</td>
+      <td>0.591328</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>100023.jpg</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.765717</td>
+      <td>0.177352</td>
+      <td>0.056931</td>
+      <td>0.000000</td>
+      <td>0.177352</td>
+      <td>0.000000</td>
+      <td>0.177352</td>
+      <td>0.000000</td>
+      <td>0.177352</td>
+      <td>0.0</td>
+      <td>...</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>100053.jpg</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.693377</td>
+      <td>0.238564</td>
+      <td>0.068059</td>
+      <td>0.000000</td>
+      <td>0.238564</td>
+      <td>0.109493</td>
+      <td>0.129071</td>
+      <td>0.189098</td>
+      <td>0.049466</td>
+      <td>0.0</td>
+      <td>...</td>
+      <td>0.094549</td>
+      <td>0.000000</td>
+      <td>0.094549</td>
+      <td>0.189098</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>100078.jpg</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.933839</td>
+      <td>0.000000</td>
+      <td>0.066161</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>...</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>100090.jpg</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 38 columns</p>
+</div>
+      <button class="colab-df-convert" onclick="convertToInteractive('df-4a4b9507-68c0-4f86-b49e-cfe5e30efe98')"
+              title="Convert this dataframe to an interactive table."
+              style="display:none;">
+
+  <svg xmlns="http://www.w3.org/2000/svg" height="24px"viewBox="0 0 24 24"
+       width="24px">
+    <path d="M0 0h24v24H0V0z" fill="none"/>
+    <path d="M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z"/><path d="M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z"/>
+  </svg>
+      </button>
+
+  <style>
+    .colab-df-container {
+      display:flex;
+      flex-wrap:wrap;
+      gap: 12px;
+    }
+
+    .colab-df-convert {
+      background-color: #E8F0FE;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      fill: #1967D2;
+      height: 32px;
+      padding: 0 0 0 0;
+      width: 32px;
+    }
+
+    .colab-df-convert:hover {
+      background-color: #E2EBFA;
+      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);
+      fill: #174EA6;
+    }
+
+    [theme=dark] .colab-df-convert {
+      background-color: #3B4455;
+      fill: #D2E3FC;
+    }
+
+    [theme=dark] .colab-df-convert:hover {
+      background-color: #434B5C;
+      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));
+      fill: #FFFFFF;
+    }
+  </style>
+
+      <script>
+        const buttonEl =
+          document.querySelector('#df-4a4b9507-68c0-4f86-b49e-cfe5e30efe98 button.colab-df-convert');
+        buttonEl.style.display =
+          google.colab.kernel.accessAllowed ? 'block' : 'none';
+
+        async function convertToInteractive(key) {
+          const element = document.querySelector('#df-4a4b9507-68c0-4f86-b49e-cfe5e30efe98');
+          const dataTable =
+            await google.colab.kernel.invokeFunction('convertToInteractive',
+                                                     [key], {});
+          if (!dataTable) return;
+
+          const docLinkHtml = 'Like what you see? Visit the ' +
+            '<a target="_blank" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'
+            + ' to learn more about interactive tables.';
+          element.innerHTML = '';
+          dataTable['output_type'] = 'display_data';
+          await google.colab.output.renderOutput(dataTable, element);
+          const docLink = document.createElement('div');
+          docLink.innerHTML = docLinkHtml;
+          element.appendChild(docLink);
+        }
+      </script>
+    </div>
+  </div>
+
+
+
+
+Let us reorder the columns so that the image filename is the first column followed by the labels.
+
+
+```python
+label_cols: list = list(column_name_mapping.values())
+training_labels = training_labels[[image_fn_col] + label_cols]
+training_labels.head()
+```
+
+
+
+
+
+  <div id="df-eec9ba1b-f7ec-4dcc-864f-6725558a1772">
+    <div class="colab-df-container">
+      <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>image_fname</th>
+      <th>smooth_galaxy</th>
+      <th>feature_disk_galaxy_star</th>
+      <th>star</th>
+      <th>edge_on_yes</th>
+      <th>edge_on_no</th>
+      <th>bar_yes</th>
+      <th>bar_no</th>
+      <th>spiral_yes</th>
+      <th>spiral_no</th>
+      <th>...</th>
+      <th>edge_on_no_bulge</th>
+      <th>tight_spiral_arms</th>
+      <th>medium_spiral_arms</th>
+      <th>loose_spiral_arms</th>
+      <th>num_arms_1</th>
+      <th>num_arms_2</th>
+      <th>num_arms_3</th>
+      <th>num_arms_4</th>
+      <th>num_arms_gt_4</th>
+      <th>num_arms_cant_tell</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>100008.jpg</td>
+      <td>0.383147</td>
+      <td>0.616853</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.616853</td>
+      <td>0.038452</td>
+      <td>0.578401</td>
+      <td>0.418398</td>
+      <td>0.198455</td>
+      <td>...</td>
+      <td>0.000000</td>
+      <td>0.279952</td>
+      <td>0.138445</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.092886</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.325512</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>100023.jpg</td>
+      <td>0.327001</td>
+      <td>0.663777</td>
+      <td>0.009222</td>
+      <td>0.031178</td>
+      <td>0.632599</td>
+      <td>0.467370</td>
+      <td>0.165229</td>
+      <td>0.591328</td>
+      <td>0.041271</td>
+      <td>...</td>
+      <td>0.018764</td>
+      <td>0.000000</td>
+      <td>0.131378</td>
+      <td>0.459950</td>
+      <td>0.000000</td>
+      <td>0.591328</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>100053.jpg</td>
+      <td>0.765717</td>
+      <td>0.177352</td>
+      <td>0.056931</td>
+      <td>0.000000</td>
+      <td>0.177352</td>
+      <td>0.000000</td>
+      <td>0.177352</td>
+      <td>0.000000</td>
+      <td>0.177352</td>
+      <td>...</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>100078.jpg</td>
+      <td>0.693377</td>
+      <td>0.238564</td>
+      <td>0.068059</td>
+      <td>0.000000</td>
+      <td>0.238564</td>
+      <td>0.109493</td>
+      <td>0.129071</td>
+      <td>0.189098</td>
+      <td>0.049466</td>
+      <td>...</td>
+      <td>0.000000</td>
+      <td>0.094549</td>
+      <td>0.000000</td>
+      <td>0.094549</td>
+      <td>0.189098</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>100090.jpg</td>
+      <td>0.933839</td>
+      <td>0.000000</td>
+      <td>0.066161</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>...</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 38 columns</p>
+</div>
+      <button class="colab-df-convert" onclick="convertToInteractive('df-eec9ba1b-f7ec-4dcc-864f-6725558a1772')"
+              title="Convert this dataframe to an interactive table."
+              style="display:none;">
+
+  <svg xmlns="http://www.w3.org/2000/svg" height="24px"viewBox="0 0 24 24"
+       width="24px">
+    <path d="M0 0h24v24H0V0z" fill="none"/>
+    <path d="M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z"/><path d="M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z"/>
+  </svg>
+      </button>
+
+  <style>
+    .colab-df-container {
+      display:flex;
+      flex-wrap:wrap;
+      gap: 12px;
+    }
+
+    .colab-df-convert {
+      background-color: #E8F0FE;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      fill: #1967D2;
+      height: 32px;
+      padding: 0 0 0 0;
+      width: 32px;
+    }
+
+    .colab-df-convert:hover {
+      background-color: #E2EBFA;
+      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);
+      fill: #174EA6;
+    }
+
+    [theme=dark] .colab-df-convert {
+      background-color: #3B4455;
+      fill: #D2E3FC;
+    }
+
+    [theme=dark] .colab-df-convert:hover {
+      background-color: #434B5C;
+      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));
+      fill: #FFFFFF;
+    }
+  </style>
+
+      <script>
+        const buttonEl =
+          document.querySelector('#df-eec9ba1b-f7ec-4dcc-864f-6725558a1772 button.colab-df-convert');
+        buttonEl.style.display =
+          google.colab.kernel.accessAllowed ? 'block' : 'none';
+
+        async function convertToInteractive(key) {
+          const element = document.querySelector('#df-eec9ba1b-f7ec-4dcc-864f-6725558a1772');
+          const dataTable =
+            await google.colab.kernel.invokeFunction('convertToInteractive',
+                                                     [key], {});
+          if (!dataTable) return;
+
+          const docLinkHtml = 'Like what you see? Visit the ' +
+            '<a target="_blank" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'
+            + ' to learn more about interactive tables.';
+          element.innerHTML = '';
+          dataTable['output_type'] = 'display_data';
+          await google.colab.output.renderOutput(dataTable, element);
+          const docLink = document.createElement('div');
+          docLink.innerHTML = docLinkHtml;
+          element.appendChild(docLink);
+        }
+      </script>
+    </div>
+  </div>
+
+
+
+
+
+```python
+train_img_dir: str = "images_training_rev1"
+test_img_dir: str = "images_test_dev1"
+```
+
+In order to create the required data structure, we will make use of the `DataBlock` class and two of its methods - `datasets()` and `dataloaders()`. We can think of `DataBlock` as a blueprint for assembling our data. In it, we specify how to fetch the inputs and outputs, how to resize inputs, etc. With `datasets()`, we specify where to fetch the inputs and outputs from. Finally, `dataloaders()` converts our data into batches that can be processed concurrently to train our model.
+
+In the next code cell, we will construct a `DataBlock` with the following information:
+- With the `blocks` argument, we specify the type of individuals blocks that we will use. A tuple input here specifies that our inputs will be images and our outputs will be some real-valued numbers.
+- The `get_x` argument is used to instruct the API where to fetch the inputs from. The first argument is the column name which holds the image file names. The second argument is the path to images.
+- With `get_y`, we specify the columns to be used as outputs.
+- By specifying the `splitter` to be `RandomSplitter()`, we instruct the API to split the images randomly into training and validation sets.
+- Before training our model, we resize the images to squares of dimension *224 x 224*. This ensures that our model is trained in reasonable time without significant loss of information.
+- Finally, we apply flip, rotate, zoom, warp, and lighting transforms on each batch of images using the `aug_tranforms()` function.
+
+
+```python
+dblocks: DataBlock = DataBlock(blocks=(ImageBlock, RegressionBlock),
+                               get_x=ColReader(image_fn_col, pref=f"{os.path.join(root_dir, train_img_dir)}/"),
+                               get_y=ColReader(label_cols),
+                               splitter=RandomSplitter(),
+                               item_tfms=Resize(224),
+                               batch_tfms=aug_transforms())
+```
+
+Having defined our `DataBlock`, let us now get a `dataloader` from it by specifying the dataframe from which the image file names and labels can be derived.
+
+
+```python
+dls: DataLoaders = dblocks.dataloaders(training_labels)
+```
+
+Once we create a `DataLoaders` object, we can print a batch of images with their labels printed on top. As our images have multiple real numbers as "labels", printing more than one image leads to messed up image headings hence we just print one for reference.
+
+
+```python
+dls.show_batch(max_n=1)
+```
+
+
+    
+![png](/Users/tejaskale/Code/fastai-with-astronomy/nbs/fastai_with_astronomy_a_galaxy_zoo_experiment_33_0.png)
+    
+
 
 ## Step 2: Train our model
 
@@ -266,6 +1412,93 @@ learn = vision_learner(dls, resnet18, metrics=error_rate)
 learn.fine_tune(3)
 ```
 
+    /usr/local/lib/python3.7/dist-packages/torchvision/models/_utils.py:209: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and will be removed in 0.15, please use 'weights' instead.
+      f"The parameter '{pretrained_param}' is deprecated since 0.13 and will be removed in 0.15, "
+    /usr/local/lib/python3.7/dist-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and will be removed in 0.15. The current behavior is equivalent to passing `weights=ResNet18_Weights.IMAGENET1K_V1`. You can also use `weights=ResNet18_Weights.DEFAULT` to get the most up-to-date weights.
+      warnings.warn(msg)
+    Downloading: "https://download.pytorch.org/models/resnet18-f37072fd.pth" to /root/.cache/torch/hub/checkpoints/resnet18-f37072fd.pth
+
+
+
+      0%|          | 0.00/44.7M [00:00<?, ?B/s]
+
+
+
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+
+
+
+
+
+    <div>
+      <progress value='0' class='' max='1' style='width:300px; height:20px; vertical-align: middle;'></progress>
+      0.00% [0/1 00:00&lt;?]
+    </div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>epoch</th>
+      <th>train_loss</th>
+      <th>valid_loss</th>
+      <th>error_rate</th>
+      <th>time</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table><p>
+
+    <div>
+      <progress value='402' class='' max='769' style='width:300px; height:20px; vertical-align: middle;'></progress>
+      52.28% [402/769 3:15:18&lt;2:58:18 0.7574]
+    </div>
+
+
+
+
+
+    <div>
+      <progress value='0' class='' max='1' style='width:300px; height:20px; vertical-align: middle;'></progress>
+      0.00% [0/1 00:00&lt;?]
+    </div>
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>epoch</th>
+      <th>train_loss</th>
+      <th>valid_loss</th>
+      <th>error_rate</th>
+      <th>time</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table><p>
+
+    <div>
+      <progress value='609' class='' max='769' style='width:300px; height:20px; vertical-align: middle;'></progress>
+      79.19% [609/769 5:00:21&lt;1:18:54 0.0845]
+    </div>
+
+
+
 Generally when I run this I see 100% accuracy on the validation set (although it might vary a bit from run to run).
 
 "Fine-tuning" a model means that we're starting with a model someone else has trained using some other dataset (called the *pretrained model*), and adjusting the weights a little bit so that the model learns to recognise your particular dataset. In this case, the pretrained model was trained to recognise photos in *imagenet*, and widely-used computer vision dataset with images covering 1000 categories) For details on fine-tuning and why it's important, check out the [free fast.ai course](https://course.fast.ai/).
@@ -288,20 +1521,6 @@ So, as you see, in the space of a few years, creating computer vision classifica
 It's not just in computer vision. Thanks to deep learning, computers can now do many things which seemed impossible just a few years ago, including [creating amazing artworks](https://openai.com/dall-e-2/), and [explaining jokes](https://www.datanami.com/2022/04/22/googles-massive-new-language-model-can-explain-jokes/). It's moving so fast that even experts in the field have trouble predicting how it's going to impact society in the coming years.
 
 One thing is clear -- it's important that we all do our best to understand this technology, because otherwise we'll get left behind!
-
-Now it's your turn. Click "Copy & Edit" and try creating your own image classifier using your own image searches!
-
-If you enjoyed this, please consider clicking the "upvote" button in the top-right -- it's very encouraging to us notebook authors to know when people appreciate our work.
-
-## References
-- [Galaxy Zoo Overview](https://www.kaggle.com/competitions/galaxy-zoo-the-galaxy-challenge)
-- [Galaxy Zoo Data](https://www.kaggle.com/competitions/galaxy-zoo-the-galaxy-challenge/data)
-- [Galaxy Zoo Decision Tree](https://www.kaggle.com/competitions/galaxy-zoo-the-galaxy-challenge/overview/the-galaxy-zoo-decision-tree)
-
-
-```python
-
-```
 
 Now it's your turn. Click "Copy & Edit" and try creating your own image classifier using your own image searches!
 
