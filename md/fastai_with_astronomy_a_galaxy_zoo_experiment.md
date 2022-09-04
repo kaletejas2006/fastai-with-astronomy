@@ -217,6 +217,8 @@ from typing import Optional, Union
 from fastai.data.all import *
 from fastai.vision.all import *
 from fastcore.foundation import L
+from sklearn.metrics import mean_squared_error
+import numpy as np
 import pandas as pd
 ```
 
@@ -235,7 +237,7 @@ training_labels.head()
 
 
 
-  <div id="df-ee86f251-78bb-408a-9099-7528f7331b98">
+  <div id="df-ed5a4f91-1d4e-4e19-90b4-ab5618e53302">
     <div class="colab-df-container">
       <div>
 <style scoped>
@@ -403,7 +405,7 @@ training_labels.head()
 </table>
 <p>5 rows × 38 columns</p>
 </div>
-      <button class="colab-df-convert" onclick="convertToInteractive('df-ee86f251-78bb-408a-9099-7528f7331b98')"
+      <button class="colab-df-convert" onclick="convertToInteractive('df-ed5a4f91-1d4e-4e19-90b4-ab5618e53302')"
               title="Convert this dataframe to an interactive table."
               style="display:none;">
 
@@ -454,12 +456,12 @@ training_labels.head()
 
       <script>
         const buttonEl =
-          document.querySelector('#df-ee86f251-78bb-408a-9099-7528f7331b98 button.colab-df-convert');
+          document.querySelector('#df-ed5a4f91-1d4e-4e19-90b4-ab5618e53302 button.colab-df-convert');
         buttonEl.style.display =
           google.colab.kernel.accessAllowed ? 'block' : 'none';
 
         async function convertToInteractive(key) {
-          const element = document.querySelector('#df-ee86f251-78bb-408a-9099-7528f7331b98');
+          const element = document.querySelector('#df-ed5a4f91-1d4e-4e19-90b4-ab5618e53302');
           const dataTable =
             await google.colab.kernel.invokeFunction('convertToInteractive',
                                                      [key], {});
@@ -496,7 +498,7 @@ training_labels.head()
 
 
 
-  <div id="df-2b978b44-a477-4906-9c26-9938f7614763">
+  <div id="df-56e0b978-994b-4168-abc3-167cdeabbfa8">
     <div class="colab-df-container">
       <div>
 <style scoped>
@@ -664,7 +666,7 @@ training_labels.head()
 </table>
 <p>5 rows × 38 columns</p>
 </div>
-      <button class="colab-df-convert" onclick="convertToInteractive('df-2b978b44-a477-4906-9c26-9938f7614763')"
+      <button class="colab-df-convert" onclick="convertToInteractive('df-56e0b978-994b-4168-abc3-167cdeabbfa8')"
               title="Convert this dataframe to an interactive table."
               style="display:none;">
 
@@ -715,12 +717,12 @@ training_labels.head()
 
       <script>
         const buttonEl =
-          document.querySelector('#df-2b978b44-a477-4906-9c26-9938f7614763 button.colab-df-convert');
+          document.querySelector('#df-56e0b978-994b-4168-abc3-167cdeabbfa8 button.colab-df-convert');
         buttonEl.style.display =
           google.colab.kernel.accessAllowed ? 'block' : 'none';
 
         async function convertToInteractive(key) {
-          const element = document.querySelector('#df-2b978b44-a477-4906-9c26-9938f7614763');
+          const element = document.querySelector('#df-56e0b978-994b-4168-abc3-167cdeabbfa8');
           const dataTable =
             await google.colab.kernel.invokeFunction('convertToInteractive',
                                                      [key], {});
@@ -798,7 +800,7 @@ training_labels.head()
 
 
 
-  <div id="df-4a4b9507-68c0-4f86-b49e-cfe5e30efe98">
+  <div id="df-fd70720d-35c1-4ef4-80f2-c3a9540924ea">
     <div class="colab-df-container">
       <div>
 <style scoped>
@@ -966,7 +968,7 @@ training_labels.head()
 </table>
 <p>5 rows × 38 columns</p>
 </div>
-      <button class="colab-df-convert" onclick="convertToInteractive('df-4a4b9507-68c0-4f86-b49e-cfe5e30efe98')"
+      <button class="colab-df-convert" onclick="convertToInteractive('df-fd70720d-35c1-4ef4-80f2-c3a9540924ea')"
               title="Convert this dataframe to an interactive table."
               style="display:none;">
 
@@ -1017,12 +1019,12 @@ training_labels.head()
 
       <script>
         const buttonEl =
-          document.querySelector('#df-4a4b9507-68c0-4f86-b49e-cfe5e30efe98 button.colab-df-convert');
+          document.querySelector('#df-fd70720d-35c1-4ef4-80f2-c3a9540924ea button.colab-df-convert');
         buttonEl.style.display =
           google.colab.kernel.accessAllowed ? 'block' : 'none';
 
         async function convertToInteractive(key) {
-          const element = document.querySelector('#df-4a4b9507-68c0-4f86-b49e-cfe5e30efe98');
+          const element = document.querySelector('#df-fd70720d-35c1-4ef4-80f2-c3a9540924ea');
           const dataTable =
             await google.colab.kernel.invokeFunction('convertToInteractive',
                                                      [key], {});
@@ -1058,7 +1060,7 @@ training_labels.head()
 
 
 
-  <div id="df-eec9ba1b-f7ec-4dcc-864f-6725558a1772">
+  <div id="df-230ed4e2-9c76-409b-8464-185ba205ff5a">
     <div class="colab-df-container">
       <div>
 <style scoped>
@@ -1226,7 +1228,7 @@ training_labels.head()
 </table>
 <p>5 rows × 38 columns</p>
 </div>
-      <button class="colab-df-convert" onclick="convertToInteractive('df-eec9ba1b-f7ec-4dcc-864f-6725558a1772')"
+      <button class="colab-df-convert" onclick="convertToInteractive('df-230ed4e2-9c76-409b-8464-185ba205ff5a')"
               title="Convert this dataframe to an interactive table."
               style="display:none;">
 
@@ -1277,12 +1279,12 @@ training_labels.head()
 
       <script>
         const buttonEl =
-          document.querySelector('#df-eec9ba1b-f7ec-4dcc-864f-6725558a1772 button.colab-df-convert');
+          document.querySelector('#df-230ed4e2-9c76-409b-8464-185ba205ff5a button.colab-df-convert');
         buttonEl.style.display =
           google.colab.kernel.accessAllowed ? 'block' : 'none';
 
         async function convertToInteractive(key) {
-          const element = document.querySelector('#df-eec9ba1b-f7ec-4dcc-864f-6725558a1772');
+          const element = document.querySelector('#df-230ed4e2-9c76-409b-8464-185ba205ff5a');
           const dataTable =
             await google.colab.kernel.invokeFunction('convertToInteractive',
                                                      [key], {});
@@ -1307,35 +1309,316 @@ training_labels.head()
 
 
 ```python
+training_labels.shape
+```
+
+
+
+
+    (61578, 38)
+
+
+
+
+```python
 train_img_dir: str = "images_training_rev1"
 test_img_dir: str = "images_test_dev1"
 ```
 
-In order to create the required data structure, we will make use of the `DataBlock` class and two of its methods - `datasets()` and `dataloaders()`. We can think of `DataBlock` as a blueprint for assembling our data. In it, we specify how to fetch the inputs and outputs, how to resize inputs, etc. With `datasets()`, we specify where to fetch the inputs and outputs from. Finally, `dataloaders()` converts our data into batches that can be processed concurrently to train our model.
+In order to create the required data structure, we will make use of the `DataBlock` class and two of its methods - `datasets()` and `dataloaders()`. We can think of `DataBlock` as a blueprint for assembling our data. In it, we specify how to fetch the inputs and outputs, how to resize inputs, etc. With `datasets()`, we specify where to fetch the inputs and outputs from. Finally, `dataloaders()`, a construct defined by PyTorch, converts our data into batches that can be processed concurrently to train our model.
+
+> `DataBlock` is an intermediate level API that can handle multiple types of ML problems (i.e. inputs and outputs). For the common types, fastai provides specialised APIs (like `SegmentationDataLoaders`) to construct `DataLoaders` with even less code.
 
 In the next code cell, we will construct a `DataBlock` with the following information:
 - With the `blocks` argument, we specify the type of individuals blocks that we will use. A tuple input here specifies that our inputs will be images and our outputs will be some real-valued numbers.
 - The `get_x` argument is used to instruct the API where to fetch the inputs from. The first argument is the column name which holds the image file names. The second argument is the path to images.
 - With `get_y`, we specify the columns to be used as outputs.
-- By specifying the `splitter` to be `RandomSplitter()`, we instruct the API to split the images randomly into training and validation sets.
-- Before training our model, we resize the images to squares of dimension *224 x 224*. This ensures that our model is trained in reasonable time without significant loss of information.
+- By specifying the `splitter` to be `RandomSplitter()`, we instruct the API to split the images randomly into training and validation sets. The default split is 80:20 in favour of the training set.
+- Before training our model, we resize the images to squares of dimension *64 x 64*. This ensures that our model is trained in reasonable time but it comes at the cost of model performance. If we can run our model training for a longer period or on more powerful hardware, a better choice for size would be *224 x 224*. The resizing is achieved by squishing the image instead of cropping it.
 - Finally, we apply flip, rotate, zoom, warp, and lighting transforms on each batch of images using the `aug_tranforms()` function.
 
 
 ```python
-dblocks: DataBlock = DataBlock(blocks=(ImageBlock, RegressionBlock),
+dblocks: DataBlock = DataBlock(blocks=(ImageBlock, RegressionBlock(n_out=len(label_cols))),
                                get_x=ColReader(image_fn_col, pref=f"{os.path.join(root_dir, train_img_dir)}/"),
                                get_y=ColReader(label_cols),
                                splitter=RandomSplitter(),
-                               item_tfms=Resize(224),
+                               item_tfms=Resize(64),
                                batch_tfms=aug_transforms())
 ```
 
-Having defined our `DataBlock`, let us now get a `dataloader` from it by specifying the dataframe from which the image file names and labels can be derived.
+Having defined our `DataBlock`, let us now get a `dataloader` from it by specifying the dataframe from which the image file names and labels can be derived. 
+
+As the training directory consists of over 60,000 images, training the model can be time-consuming. For a quick trial run of model training, we train only on a randomly selected set of 5000 images.
 
 
 ```python
-dls: DataLoaders = dblocks.dataloaders(training_labels)
+sample_size: int = 5000
+sample_training_labels: pd.DataFrame = training_labels.sample(sample_size)
+sample_training_labels.head()
+```
+
+
+
+
+
+  <div id="df-c797aa2e-556f-4ecf-9427-5a3e467df0f1">
+    <div class="colab-df-container">
+      <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>image_fname</th>
+      <th>smooth_galaxy</th>
+      <th>feature_disk_galaxy_star</th>
+      <th>star</th>
+      <th>edge_on_yes</th>
+      <th>edge_on_no</th>
+      <th>bar_yes</th>
+      <th>bar_no</th>
+      <th>spiral_yes</th>
+      <th>spiral_no</th>
+      <th>...</th>
+      <th>edge_on_no_bulge</th>
+      <th>tight_spiral_arms</th>
+      <th>medium_spiral_arms</th>
+      <th>loose_spiral_arms</th>
+      <th>num_arms_1</th>
+      <th>num_arms_2</th>
+      <th>num_arms_3</th>
+      <th>num_arms_4</th>
+      <th>num_arms_gt_4</th>
+      <th>num_arms_cant_tell</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>50561</th>
+      <td>836438.jpg</td>
+      <td>0.052811</td>
+      <td>0.947189</td>
+      <td>0.000000</td>
+      <td>0.027267</td>
+      <td>0.919922</td>
+      <td>0.919922</td>
+      <td>0.000000</td>
+      <td>0.653864</td>
+      <td>0.266058</td>
+      <td>...</td>
+      <td>0.000000</td>
+      <td>0.149509</td>
+      <td>0.233603</td>
+      <td>0.270752</td>
+      <td>0.000000</td>
+      <td>0.564371</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.089493</td>
+    </tr>
+    <tr>
+      <th>41238</th>
+      <td>701563.jpg</td>
+      <td>0.670700</td>
+      <td>0.283759</td>
+      <td>0.045541</td>
+      <td>0.000000</td>
+      <td>0.283759</td>
+      <td>0.000000</td>
+      <td>0.283759</td>
+      <td>0.000000</td>
+      <td>0.283759</td>
+      <td>...</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>48274</th>
+      <td>803149.jpg</td>
+      <td>0.690748</td>
+      <td>0.226279</td>
+      <td>0.082973</td>
+      <td>0.000000</td>
+      <td>0.226279</td>
+      <td>0.000000</td>
+      <td>0.226279</td>
+      <td>0.000000</td>
+      <td>0.226279</td>
+      <td>...</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>51265</th>
+      <td>846529.jpg</td>
+      <td>0.621357</td>
+      <td>0.378643</td>
+      <td>0.000000</td>
+      <td>0.149954</td>
+      <td>0.228689</td>
+      <td>0.122129</td>
+      <td>0.106560</td>
+      <td>0.050993</td>
+      <td>0.177696</td>
+      <td>...</td>
+      <td>0.074977</td>
+      <td>0.000000</td>
+      <td>0.050993</td>
+      <td>0.000000</td>
+      <td>0.025497</td>
+      <td>0.025497</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <th>33636</th>
+      <td>592800.jpg</td>
+      <td>0.546230</td>
+      <td>0.431825</td>
+      <td>0.021945</td>
+      <td>0.062907</td>
+      <td>0.368918</td>
+      <td>0.099658</td>
+      <td>0.269260</td>
+      <td>0.000000</td>
+      <td>0.368918</td>
+      <td>...</td>
+      <td>0.031453</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 38 columns</p>
+</div>
+      <button class="colab-df-convert" onclick="convertToInteractive('df-c797aa2e-556f-4ecf-9427-5a3e467df0f1')"
+              title="Convert this dataframe to an interactive table."
+              style="display:none;">
+
+  <svg xmlns="http://www.w3.org/2000/svg" height="24px"viewBox="0 0 24 24"
+       width="24px">
+    <path d="M0 0h24v24H0V0z" fill="none"/>
+    <path d="M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z"/><path d="M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z"/>
+  </svg>
+      </button>
+
+  <style>
+    .colab-df-container {
+      display:flex;
+      flex-wrap:wrap;
+      gap: 12px;
+    }
+
+    .colab-df-convert {
+      background-color: #E8F0FE;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      fill: #1967D2;
+      height: 32px;
+      padding: 0 0 0 0;
+      width: 32px;
+    }
+
+    .colab-df-convert:hover {
+      background-color: #E2EBFA;
+      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);
+      fill: #174EA6;
+    }
+
+    [theme=dark] .colab-df-convert {
+      background-color: #3B4455;
+      fill: #D2E3FC;
+    }
+
+    [theme=dark] .colab-df-convert:hover {
+      background-color: #434B5C;
+      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));
+      fill: #FFFFFF;
+    }
+  </style>
+
+      <script>
+        const buttonEl =
+          document.querySelector('#df-c797aa2e-556f-4ecf-9427-5a3e467df0f1 button.colab-df-convert');
+        buttonEl.style.display =
+          google.colab.kernel.accessAllowed ? 'block' : 'none';
+
+        async function convertToInteractive(key) {
+          const element = document.querySelector('#df-c797aa2e-556f-4ecf-9427-5a3e467df0f1');
+          const dataTable =
+            await google.colab.kernel.invokeFunction('convertToInteractive',
+                                                     [key], {});
+          if (!dataTable) return;
+
+          const docLinkHtml = 'Like what you see? Visit the ' +
+            '<a target="_blank" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'
+            + ' to learn more about interactive tables.';
+          element.innerHTML = '';
+          dataTable['output_type'] = 'display_data';
+          await google.colab.output.renderOutput(dataTable, element);
+          const docLink = document.createElement('div');
+          docLink.innerHTML = docLinkHtml;
+          element.appendChild(docLink);
+        }
+      </script>
+    </div>
+  </div>
+
+
+
+
+If we face issues later on during model training, it is a good idea to take a peek at the `DataBlock` we created. Using the `summary()` method (uncomment and execute the cell below), we get an idea of the inputs and outputs that the model is trained with.
+
+
+```python
+# dblocks.summary(training_labels)
+```
+
+
+```python
+dls: DataLoaders = dblocks.dataloaders(sample_training_labels)
 ```
 
 Once we create a `DataLoaders` object, we can print a batch of images with their labels printed on top. As our images have multiple real numbers as "labels", printing more than one image leads to messed up image headings hence we just print one for reference.
@@ -1345,71 +1628,31 @@ Once we create a `DataLoaders` object, we can print a batch of images with their
 dls.show_batch(max_n=1)
 ```
 
-
-    
-![png](/Users/tejaskale/Code/fastai-with-astronomy/nbs/fastai_with_astronomy_a_galaxy_zoo_experiment_33_0.png)
-    
-
-
 ## Step 2: Train our model
 
-To train a model, we'll need `DataLoaders`, which is an object that contains a *training set* (the images used to create a model) and a *validation set* (the images used to check the accuracy of a model -- not used during training). 
+Having set up the data, training a model with fastai is simple. As we want to build a model for image data, we use the `vision_learner` API which requires three arguments:
+- The `DataLoader` object
+- The model architecture to use
+- The metric to evaluate model performance
 
-> It is a construct that is used by PyTorch to iterate through and grab a section of data at a time. 
+> In fastai's parlance, a *learner* is a construct that combines a model and the data used to train the model.
 
-> `DataBlock` is an intermediate level API that can handle multiple types of ML problems (i.e. inputs and outputs). For the common types, fastai provides specialised APIs (like `SegmentationDataLoaders`) to construct `DataLoaders` with even less code.
+Model architecture here refers to the exact specification of a neural network i.e. the number and types of hidden layers. There are numerous predefined and pretrained model architectures already available and we use the `resnet18` architecture which was first introduced in the paper [Deep Residual Learning for Image Recognition](https://arxiv.org/pdf/1512.03385.pdf). 
+
+To train a model, a *loss* function is minimised. As part of this minimisation, the weights (i.e. parameters) of the neural network are optimised. But to understand how effective a network is for our specific application, we define another function which is called the *metric*. In the Galaxy Zoo competition, as the output is a bunch of real-valued numbers, the organisers chose RMSE (root mean squared error) as the metric.
+
+In the following cell, we train our `resnet18` model using the `fine_tune()` method. This method automatically uses the best practices to refine a pretrained model. A *pretrained* model is a neural network architecture whose weights are learnt from training it on a large dataset like [ImageNet](https://www.image-net.org/) which consists of millions of images. We can then reuse these weights except for the last few layers and train our model by optimising the weights for these layers. Using models trained previously on larger datasets for applications in new datasets is known as *transfer learning*.
+
+In case of image data, it has been observed that the initial layers of the network learn elementary shapes like straight lines, edges, etc. The next layers can then recognise more complex shapes like circles, squares, etc. Hence, the intuition behind transfer learning is that in applications like image data where identification of basic shapes is vital, it is better to reuse the model's pretrained ability to recognise these shapes rather than training it from scratch with a new data.
 
 > Unlike image data which consists of images and every image is similar in terms of its technical constituents (like RGB colours), each tabular data is defined by the columns (also called *features*) and hence is different. So, when running a fastai learner on tabular data, the method that is called is `fit_one_cycle()` and not `fine_tune()` as is the case for image data.
 
 > Jeremy suggests the following rule of thumb to decide if our problem can be solved effectively with deep learning - if it is a task that a human, even an expert, can do reasonably quickly (like identifying a scene in an image), deep learning will be able to automate the task but if the task requires lots of logical thought process over an extended period of time with not much data (like predicting an election), deep learning won't be a good fit.
 
-In `fastai` we can create that easily using a `DataBlock`, and view sample images from it:
-
 
 ```python
-dls = DataBlock(
-    blocks=(ImageBlock, CategoryBlock), 
-    get_items=get_image_files, 
-    splitter=RandomSplitter(valid_pct=0.2, seed=42),
-    get_y=parent_label,
-    item_tfms=[Resize(192, method='squish')]
-).dataloaders(path)
-
-dls.show_batch(max_n=6)
-```
-
-Here what each of the `DataBlock` parameters means:
-
-    blocks=(ImageBlock, CategoryBlock),
-
-The inputs to our model are images, and the outputs are categories (in this case, "bird" or "forest").
-
-    get_items=get_image_files, 
-
-To find all the inputs to our model, run the `get_image_files` function (which returns a list of all image files in a path).
-
-    splitter=RandomSplitter(valid_pct=0.2, seed=42),
-
-Split the data into training and validation sets randomly, using 20% of the data for the validation set.
-
-    get_y=parent_label,
-
-The labels (`y` values) is the name of the `parent` of each file (i.e. the name of the folder they're in, which will be *bird* or *forest*).
-
-    item_tfms=[Resize(192, method='squish')]
-
-Before training, resize each image to 192x192 pixels by "squishing" it (as opposed to cropping it).
-
-Now we're ready to train our model. The fastest widely used computer vision model is `resnet18`. You can train this in a few minutes, even on a CPU! (On a GPU, it generally takes under 10 seconds...)
-
-> In fastai's parlance, a *learner* is a construct that combines a model and the data used to train the model.
-
-`fastai` comes with a helpful `fine_tune()` method which automatically uses best practices for fine tuning a pre-trained model, so we'll use that.
-
-
-```python
-learn = vision_learner(dls, resnet18, metrics=error_rate)
-learn.fine_tune(3)
+learn = vision_learner(dls, resnet18, metrics=rmse)
+learn.fine_tune(10)
 ```
 
     /usr/local/lib/python3.7/dist-packages/torchvision/models/_utils.py:209: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and will be removed in 0.15, please use 'weights' instead.
@@ -1444,11 +1687,48 @@ learn.fine_tune(3)
 
 
 
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>epoch</th>
+      <th>train_loss</th>
+      <th>valid_loss</th>
+      <th>_rmse</th>
+      <th>time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>2.811779</td>
+      <td>0.619597</td>
+      <td>0.787145</td>
+      <td>38:57</td>
+    </tr>
+  </tbody>
+</table>
 
-    <div>
-      <progress value='0' class='' max='1' style='width:300px; height:20px; vertical-align: middle;'></progress>
-      0.00% [0/1 00:00&lt;?]
-    </div>
+
+
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+
+
+
 
 <table border="1" class="dataframe">
   <thead>
@@ -1456,82 +1736,568 @@ learn.fine_tune(3)
       <th>epoch</th>
       <th>train_loss</th>
       <th>valid_loss</th>
-      <th>error_rate</th>
+      <th>_rmse</th>
       <th>time</th>
     </tr>
   </thead>
   <tbody>
-  </tbody>
-</table><p>
-
-    <div>
-      <progress value='402' class='' max='769' style='width:300px; height:20px; vertical-align: middle;'></progress>
-      52.28% [402/769 3:15:18&lt;2:58:18 0.7574]
-    </div>
-
-
-
-
-
-    <div>
-      <progress value='0' class='' max='1' style='width:300px; height:20px; vertical-align: middle;'></progress>
-      0.00% [0/1 00:00&lt;?]
-    </div>
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: left;">
-      <th>epoch</th>
-      <th>train_loss</th>
-      <th>valid_loss</th>
-      <th>error_rate</th>
-      <th>time</th>
+    <tr>
+      <td>0</td>
+      <td>1.542153</td>
+      <td>0.378720</td>
+      <td>0.615402</td>
+      <td>00:30</td>
     </tr>
-  </thead>
-  <tbody>
+    <tr>
+      <td>1</td>
+      <td>1.203045</td>
+      <td>0.243702</td>
+      <td>0.493662</td>
+      <td>00:30</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>0.867625</td>
+      <td>0.132818</td>
+      <td>0.364442</td>
+      <td>00:32</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>0.626789</td>
+      <td>0.104045</td>
+      <td>0.322560</td>
+      <td>00:30</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>0.459252</td>
+      <td>0.054796</td>
+      <td>0.234085</td>
+      <td>00:30</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>0.358750</td>
+      <td>0.051239</td>
+      <td>0.226360</td>
+      <td>00:31</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>0.292601</td>
+      <td>0.039900</td>
+      <td>0.199751</td>
+      <td>00:29</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>0.252261</td>
+      <td>0.031948</td>
+      <td>0.178741</td>
+      <td>00:29</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>0.231624</td>
+      <td>0.028121</td>
+      <td>0.167692</td>
+      <td>00:32</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>0.225050</td>
+      <td>0.025679</td>
+      <td>0.160248</td>
+      <td>00:30</td>
+    </tr>
   </tbody>
-</table><p>
-
-    <div>
-      <progress value='609' class='' max='769' style='width:300px; height:20px; vertical-align: middle;'></progress>
-      79.19% [609/769 5:00:21&lt;1:18:54 0.0845]
-    </div>
+</table>
 
 
+If we look at the Kaggle [leaderboard](https://www.kaggle.com/competitions/galaxy-zoo-the-galaxy-challenge/leaderboard) for this competition, we see that the RMSE for the *Central Pixel Benchmark* is 0.16194. With a training sample that is ~8% of the total available images and image size of just *64 x 64*, the `resnet18` model is able to achieve similar validation RMSE. This bodes well for our future experiments with the entire training data and larger images.
 
-Generally when I run this I see 100% accuracy on the validation set (although it might vary a bit from run to run).
+## Step 3: Use our model
 
-"Fine-tuning" a model means that we're starting with a model someone else has trained using some other dataset (called the *pretrained model*), and adjusting the weights a little bit so that the model learns to recognise your particular dataset. In this case, the pretrained model was trained to recognise photos in *imagenet*, and widely-used computer vision dataset with images covering 1000 categories) For details on fine-tuning and why it's important, check out the [free fast.ai course](https://course.fast.ai/).
-
-## Step 3: Use our model (and build your own!)
-
-Let's see what our model thinks about that bird we downloaded at the start:
+Having trained our model, let us now generate predictions from it on images it has not seen during training. As we did not train our model on the entire training data, let us pick an image not previously seen by the model and then load it along with its labels.
 
 
 ```python
-is_bird,_,probs = learn.predict(PILImage.create('bird.jpg'))
-print(f"This is a: {is_bird}.")
-print(f"Probability it's a bird: {probs[0]:.4f}")
+untrained_samples: pd.DataFrame = pd.concat([training_labels, sample_training_labels]).drop_duplicates(keep=False)
+a_sample: pd.Series = untrained_samples.sample(1).iloc[0]
+a_sample
 ```
 
-Good job, resnet18. :)
 
-So, as you see, in the space of a few years, creating computer vision classification models has gone from "so hard it's a joke" to "trivially easy and free"!
 
-It's not just in computer vision. Thanks to deep learning, computers can now do many things which seemed impossible just a few years ago, including [creating amazing artworks](https://openai.com/dall-e-2/), and [explaining jokes](https://www.datanami.com/2022/04/22/googles-massive-new-language-model-can-explain-jokes/). It's moving so fast that even experts in the field have trouble predicting how it's going to impact society in the coming years.
 
-One thing is clear -- it's important that we all do our best to understand this technology, because otherwise we'll get left behind!
+    image_fname                 366846.jpg
+    smooth_galaxy                 0.191971
+    feature_disk_galaxy_star      0.808029
+    star                               0.0
+    edge_on_yes                   0.808029
+    edge_on_no                         0.0
+    bar_yes                            0.0
+    bar_no                             0.0
+    spiral_yes                         0.0
+    spiral_no                          0.0
+    no_bulge                           0.0
+    noticeable_bulge                   0.0
+    obvious_bulge                      0.0
+    dominant_bulge                     0.0
+    something_odd_yes             0.041789
+    something_odd_no              0.958211
+    round                              0.0
+    in_between                         0.0
+    cigar                         0.191971
+    ring                               0.0
+    lens_arc                           0.0
+    disturbed                          0.0
+    irregular                          0.0
+    other                         0.020894
+    merger                             0.0
+    dust_lane                     0.020894
+    edge_on_rounded_bulge         0.084928
+    edge_on_boxy_bulge             0.02103
+    edge_on_no_bulge              0.702071
+    tight_spiral_arms                  0.0
+    medium_spiral_arms                 0.0
+    loose_spiral_arms                  0.0
+    num_arms_1                         0.0
+    num_arms_2                         0.0
+    num_arms_3                         0.0
+    num_arms_4                         0.0
+    num_arms_gt_4                      0.0
+    num_arms_cant_tell                 0.0
+    Name: 18136, dtype: object
 
-Now it's your turn. Click "Copy & Edit" and try creating your own image classifier using your own image searches!
 
-If you enjoyed this, please consider clicking the "upvote" button in the top-right -- it's very encouraging to us notebook authors to know when people appreciate our work.
+
+
+```python
+a_sample_image_fn: str = os.path.join(root_dir, train_img_dir, a_sample["image_fname"])
+a_sample_image_fn
+```
+
+
+
+
+    '/content/gdrive/My Drive/Colab Notebooks/fastai_2022/data/galaxy-zoo-the-galaxy-challenge/images_training_rev1/366846.jpg'
+
+
+
+
+```python
+a_sample_labels: pd.Series = a_sample.drop("image_fname")
+a_sample_labels
+```
+
+
+
+
+    smooth_galaxy               0.191971
+    feature_disk_galaxy_star    0.808029
+    star                             0.0
+    edge_on_yes                 0.808029
+    edge_on_no                       0.0
+    bar_yes                          0.0
+    bar_no                           0.0
+    spiral_yes                       0.0
+    spiral_no                        0.0
+    no_bulge                         0.0
+    noticeable_bulge                 0.0
+    obvious_bulge                    0.0
+    dominant_bulge                   0.0
+    something_odd_yes           0.041789
+    something_odd_no            0.958211
+    round                            0.0
+    in_between                       0.0
+    cigar                       0.191971
+    ring                             0.0
+    lens_arc                         0.0
+    disturbed                        0.0
+    irregular                        0.0
+    other                       0.020894
+    merger                           0.0
+    dust_lane                   0.020894
+    edge_on_rounded_bulge       0.084928
+    edge_on_boxy_bulge           0.02103
+    edge_on_no_bulge            0.702071
+    tight_spiral_arms                0.0
+    medium_spiral_arms               0.0
+    loose_spiral_arms                0.0
+    num_arms_1                       0.0
+    num_arms_2                       0.0
+    num_arms_3                       0.0
+    num_arms_4                       0.0
+    num_arms_gt_4                    0.0
+    num_arms_cant_tell               0.0
+    Name: 18136, dtype: object
+
+
+
+Let us now get the model's prediction about this image. In case of a classification model, the output of `predict` consists of three parts - the predicted class, the loss value, and probability of the item belonging to the specified class. As our output is a set of real-valued numbers, all three parts will hold the same values so we only extract the first.
+
+
+```python
+preds, _, _ = learn.predict(PILImage.create(a_sample_image_fn))
+```
+
+
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+
+
+
+
+
+
+
+
+```python
+pred_comparison: pd.DataFrame = pd.DataFrame({"actual": a_sample_labels, "predicted": preds})
+pred_comparison
+```
+
+
+
+
+
+  <div id="df-3249c6ce-2f57-4d7e-a4b3-2050c5858aba">
+    <div class="colab-df-container">
+      <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>actual</th>
+      <th>predicted</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>smooth_galaxy</th>
+      <td>0.191971</td>
+      <td>0.255439</td>
+    </tr>
+    <tr>
+      <th>feature_disk_galaxy_star</th>
+      <td>0.808029</td>
+      <td>0.688818</td>
+    </tr>
+    <tr>
+      <th>star</th>
+      <td>0.0</td>
+      <td>0.010513</td>
+    </tr>
+    <tr>
+      <th>edge_on_yes</th>
+      <td>0.808029</td>
+      <td>0.185081</td>
+    </tr>
+    <tr>
+      <th>edge_on_no</th>
+      <td>0.0</td>
+      <td>0.414208</td>
+    </tr>
+    <tr>
+      <th>bar_yes</th>
+      <td>0.0</td>
+      <td>0.123436</td>
+    </tr>
+    <tr>
+      <th>bar_no</th>
+      <td>0.0</td>
+      <td>0.305286</td>
+    </tr>
+    <tr>
+      <th>spiral_yes</th>
+      <td>0.0</td>
+      <td>0.277926</td>
+    </tr>
+    <tr>
+      <th>spiral_no</th>
+      <td>0.0</td>
+      <td>0.171088</td>
+    </tr>
+    <tr>
+      <th>no_bulge</th>
+      <td>0.0</td>
+      <td>0.040379</td>
+    </tr>
+    <tr>
+      <th>noticeable_bulge</th>
+      <td>0.0</td>
+      <td>0.187243</td>
+    </tr>
+    <tr>
+      <th>obvious_bulge</th>
+      <td>0.0</td>
+      <td>0.154595</td>
+    </tr>
+    <tr>
+      <th>dominant_bulge</th>
+      <td>0.0</td>
+      <td>0.045942</td>
+    </tr>
+    <tr>
+      <th>something_odd_yes</th>
+      <td>0.041789</td>
+      <td>0.210354</td>
+    </tr>
+    <tr>
+      <th>something_odd_no</th>
+      <td>0.958211</td>
+      <td>0.741136</td>
+    </tr>
+    <tr>
+      <th>round</th>
+      <td>0.0</td>
+      <td>0.037089</td>
+    </tr>
+    <tr>
+      <th>in_between</th>
+      <td>0.0</td>
+      <td>0.069814</td>
+    </tr>
+    <tr>
+      <th>cigar</th>
+      <td>0.191971</td>
+      <td>0.108493</td>
+    </tr>
+    <tr>
+      <th>ring</th>
+      <td>0.0</td>
+      <td>0.031521</td>
+    </tr>
+    <tr>
+      <th>lens_arc</th>
+      <td>0.0</td>
+      <td>-0.017145</td>
+    </tr>
+    <tr>
+      <th>disturbed</th>
+      <td>0.0</td>
+      <td>0.025244</td>
+    </tr>
+    <tr>
+      <th>irregular</th>
+      <td>0.0</td>
+      <td>0.050384</td>
+    </tr>
+    <tr>
+      <th>other</th>
+      <td>0.020894</td>
+      <td>0.023533</td>
+    </tr>
+    <tr>
+      <th>merger</th>
+      <td>0.0</td>
+      <td>0.026203</td>
+    </tr>
+    <tr>
+      <th>dust_lane</th>
+      <td>0.020894</td>
+      <td>0.033895</td>
+    </tr>
+    <tr>
+      <th>edge_on_rounded_bulge</th>
+      <td>0.084928</td>
+      <td>0.080261</td>
+    </tr>
+    <tr>
+      <th>edge_on_boxy_bulge</th>
+      <td>0.02103</td>
+      <td>0.003606</td>
+    </tr>
+    <tr>
+      <th>edge_on_no_bulge</th>
+      <td>0.702071</td>
+      <td>0.064877</td>
+    </tr>
+    <tr>
+      <th>tight_spiral_arms</th>
+      <td>0.0</td>
+      <td>0.104013</td>
+    </tr>
+    <tr>
+      <th>medium_spiral_arms</th>
+      <td>0.0</td>
+      <td>0.064156</td>
+    </tr>
+    <tr>
+      <th>loose_spiral_arms</th>
+      <td>0.0</td>
+      <td>0.015215</td>
+    </tr>
+    <tr>
+      <th>num_arms_1</th>
+      <td>0.0</td>
+      <td>-0.030347</td>
+    </tr>
+    <tr>
+      <th>num_arms_2</th>
+      <td>0.0</td>
+      <td>0.121153</td>
+    </tr>
+    <tr>
+      <th>num_arms_3</th>
+      <td>0.0</td>
+      <td>0.086617</td>
+    </tr>
+    <tr>
+      <th>num_arms_4</th>
+      <td>0.0</td>
+      <td>-0.048762</td>
+    </tr>
+    <tr>
+      <th>num_arms_gt_4</th>
+      <td>0.0</td>
+      <td>-0.032254</td>
+    </tr>
+    <tr>
+      <th>num_arms_cant_tell</th>
+      <td>0.0</td>
+      <td>0.076952</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+      <button class="colab-df-convert" onclick="convertToInteractive('df-3249c6ce-2f57-4d7e-a4b3-2050c5858aba')"
+              title="Convert this dataframe to an interactive table."
+              style="display:none;">
+
+  <svg xmlns="http://www.w3.org/2000/svg" height="24px"viewBox="0 0 24 24"
+       width="24px">
+    <path d="M0 0h24v24H0V0z" fill="none"/>
+    <path d="M18.56 5.44l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94zm-11 1L8.5 8.5l.94-2.06 2.06-.94-2.06-.94L8.5 2.5l-.94 2.06-2.06.94zm10 10l.94 2.06.94-2.06 2.06-.94-2.06-.94-.94-2.06-.94 2.06-2.06.94z"/><path d="M17.41 7.96l-1.37-1.37c-.4-.4-.92-.59-1.43-.59-.52 0-1.04.2-1.43.59L10.3 9.45l-7.72 7.72c-.78.78-.78 2.05 0 2.83L4 21.41c.39.39.9.59 1.41.59.51 0 1.02-.2 1.41-.59l7.78-7.78 2.81-2.81c.8-.78.8-2.07 0-2.86zM5.41 20L4 18.59l7.72-7.72 1.47 1.35L5.41 20z"/>
+  </svg>
+      </button>
+
+  <style>
+    .colab-df-container {
+      display:flex;
+      flex-wrap:wrap;
+      gap: 12px;
+    }
+
+    .colab-df-convert {
+      background-color: #E8F0FE;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      fill: #1967D2;
+      height: 32px;
+      padding: 0 0 0 0;
+      width: 32px;
+    }
+
+    .colab-df-convert:hover {
+      background-color: #E2EBFA;
+      box-shadow: 0px 1px 2px rgba(60, 64, 67, 0.3), 0px 1px 3px 1px rgba(60, 64, 67, 0.15);
+      fill: #174EA6;
+    }
+
+    [theme=dark] .colab-df-convert {
+      background-color: #3B4455;
+      fill: #D2E3FC;
+    }
+
+    [theme=dark] .colab-df-convert:hover {
+      background-color: #434B5C;
+      box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+      filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3));
+      fill: #FFFFFF;
+    }
+  </style>
+
+      <script>
+        const buttonEl =
+          document.querySelector('#df-3249c6ce-2f57-4d7e-a4b3-2050c5858aba button.colab-df-convert');
+        buttonEl.style.display =
+          google.colab.kernel.accessAllowed ? 'block' : 'none';
+
+        async function convertToInteractive(key) {
+          const element = document.querySelector('#df-3249c6ce-2f57-4d7e-a4b3-2050c5858aba');
+          const dataTable =
+            await google.colab.kernel.invokeFunction('convertToInteractive',
+                                                     [key], {});
+          if (!dataTable) return;
+
+          const docLinkHtml = 'Like what you see? Visit the ' +
+            '<a target="_blank" href=https://colab.research.google.com/notebooks/data_table.ipynb>data table notebook</a>'
+            + ' to learn more about interactive tables.';
+          element.innerHTML = '';
+          dataTable['output_type'] = 'display_data';
+          await google.colab.output.renderOutput(dataTable, element);
+          const docLink = document.createElement('div');
+          docLink.innerHTML = docLinkHtml;
+          element.appendChild(docLink);
+        }
+      </script>
+    </div>
+  </div>
+
+
+
+
+
+```python
+pred_rmse: float = np.sqrt(mean_squared_error(a_sample_labels, preds))
+pred_rmse
+```
+
+
+
+
+    0.19477374627075728
+
+
+
+For this image, we are getting a RMSE that is slightly worse than the average validation RMSE we saw earlier. Regardless, this model is a good start towards tackling the Galaxy Zoo problem with fastai. The entire process from loading the data to predicting the output is straightforward. Initially, we need to spend some time understanding the `DataBlock` API to know how to structure our data. In addition, we also need to have some understanding of a `learner` and how its arguments relate to the type of data used for modelling.
+
+As discussed earlier, there are numerous modifications that can help us improve or speed up the results. These include:
+<ol>
+<li>Experiments with using TPUs to speed up model training.</li>
+<li>If (1.) is successful, model improvements that we can experiment with are:</li>
+<ul>
+<li>Train with larger image sizes (`128 x 128` or `224 x 224`).</li>
+<li>Train with the entire training data.</li>
+<li>Explore deeper model architectures like `resnet50`.</li>
+<li>Try different data augmentations.</li>
+</ul>
+</ol>
+    
 
 ## References
 - [Galaxy Zoo Overview](https://www.kaggle.com/competitions/galaxy-zoo-the-galaxy-challenge)
 - [Galaxy Zoo Data](https://www.kaggle.com/competitions/galaxy-zoo-the-galaxy-challenge/data)
 - [Galaxy Zoo Decision Tree](https://www.kaggle.com/competitions/galaxy-zoo-the-galaxy-challenge/overview/the-galaxy-zoo-decision-tree)
-
-
-```python
-
-```
