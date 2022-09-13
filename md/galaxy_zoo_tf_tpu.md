@@ -44,14 +44,18 @@ os.listdir(root_dir)
 
 
 ```python
+from datetime import datetime
 from pathlib import Path
 from sklearn.model_selection import train_test_split
 from tensorflow.data import Dataset
+from tensorflow.keras import Sequential
+from tensorflow.keras.callbacks import TensorBoard
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import tensorflow as tf
+import tensorflow_hub as hub
 ```
 
 ## Step 1: Load data
@@ -92,33 +96,11 @@ for f in list_ds.take(5):
     print(f.numpy())
 ```
 
-    b'/content/gdrive/My Drive/Colab Notebooks/fastai_2022/data/galaxy-zoo-the-galaxy-challenge/images_training_rev1/141797.jpg'
-    b'/content/gdrive/My Drive/Colab Notebooks/fastai_2022/data/galaxy-zoo-the-galaxy-challenge/images_training_rev1/662864.jpg'
-    b'/content/gdrive/My Drive/Colab Notebooks/fastai_2022/data/galaxy-zoo-the-galaxy-challenge/images_training_rev1/660357.jpg'
-    b'/content/gdrive/My Drive/Colab Notebooks/fastai_2022/data/galaxy-zoo-the-galaxy-challenge/images_training_rev1/865211.jpg'
-    b'/content/gdrive/My Drive/Colab Notebooks/fastai_2022/data/galaxy-zoo-the-galaxy-challenge/images_training_rev1/728384.jpg'
-
-
-Let us split the training images into training and validation sets.
-
-
-```python
-val_size: int = int(image_count * val_factor)
-train_ds: Dataset = list_ds.skip(val_size)
-valid_ds: Dataset = list_ds.take(val_size)
-```
-
-
-```python
-for f in train_ds.take(5):
-    print(f.numpy())
-```
-
-    b'/content/gdrive/My Drive/Colab Notebooks/fastai_2022/data/galaxy-zoo-the-galaxy-challenge/images_training_rev1/948852.jpg'
-    b'/content/gdrive/My Drive/Colab Notebooks/fastai_2022/data/galaxy-zoo-the-galaxy-challenge/images_training_rev1/427314.jpg'
-    b'/content/gdrive/My Drive/Colab Notebooks/fastai_2022/data/galaxy-zoo-the-galaxy-challenge/images_training_rev1/524106.jpg'
-    b'/content/gdrive/My Drive/Colab Notebooks/fastai_2022/data/galaxy-zoo-the-galaxy-challenge/images_training_rev1/780749.jpg'
-    b'/content/gdrive/My Drive/Colab Notebooks/fastai_2022/data/galaxy-zoo-the-galaxy-challenge/images_training_rev1/894029.jpg'
+    b'/content/gdrive/My Drive/Colab Notebooks/fastai_2022/data/galaxy-zoo-the-galaxy-challenge/images_training_rev1/131465.jpg'
+    b'/content/gdrive/My Drive/Colab Notebooks/fastai_2022/data/galaxy-zoo-the-galaxy-challenge/images_training_rev1/744668.jpg'
+    b'/content/gdrive/My Drive/Colab Notebooks/fastai_2022/data/galaxy-zoo-the-galaxy-challenge/images_training_rev1/135172.jpg'
+    b'/content/gdrive/My Drive/Colab Notebooks/fastai_2022/data/galaxy-zoo-the-galaxy-challenge/images_training_rev1/573937.jpg'
+    b'/content/gdrive/My Drive/Colab Notebooks/fastai_2022/data/galaxy-zoo-the-galaxy-challenge/images_training_rev1/123647.jpg'
 
 
 We know that the outputs for these images are available as columns in `training_solutions_rev1.csv`. Let us first load and peek at this table.
@@ -133,7 +115,7 @@ training_outputs.head()
 
 
 
-  <div id="df-4666b545-8d4d-42e2-882e-b0069ce82282">
+  <div id="df-7fbb8eea-f5ac-4192-a048-086a642d73bd">
     <div class="colab-df-container">
       <div>
 <style scoped>
@@ -301,7 +283,7 @@ training_outputs.head()
 </table>
 <p>5 rows × 38 columns</p>
 </div>
-      <button class="colab-df-convert" onclick="convertToInteractive('df-4666b545-8d4d-42e2-882e-b0069ce82282')"
+      <button class="colab-df-convert" onclick="convertToInteractive('df-7fbb8eea-f5ac-4192-a048-086a642d73bd')"
               title="Convert this dataframe to an interactive table."
               style="display:none;">
 
@@ -352,12 +334,12 @@ training_outputs.head()
 
       <script>
         const buttonEl =
-          document.querySelector('#df-4666b545-8d4d-42e2-882e-b0069ce82282 button.colab-df-convert');
+          document.querySelector('#df-7fbb8eea-f5ac-4192-a048-086a642d73bd button.colab-df-convert');
         buttonEl.style.display =
           google.colab.kernel.accessAllowed ? 'block' : 'none';
 
         async function convertToInteractive(key) {
-          const element = document.querySelector('#df-4666b545-8d4d-42e2-882e-b0069ce82282');
+          const element = document.querySelector('#df-7fbb8eea-f5ac-4192-a048-086a642d73bd');
           const dataTable =
             await google.colab.kernel.invokeFunction('convertToInteractive',
                                                      [key], {});
@@ -393,7 +375,7 @@ training_outputs.head()
 
 
 
-  <div id="df-39e06d30-d348-412a-a655-e2f82481dfae">
+  <div id="df-fb0b9d50-e63f-4c2b-b9fe-b0b15eb3ad5b">
     <div class="colab-df-container">
       <div>
 <style scoped>
@@ -561,7 +543,7 @@ training_outputs.head()
 </table>
 <p>5 rows × 38 columns</p>
 </div>
-      <button class="colab-df-convert" onclick="convertToInteractive('df-39e06d30-d348-412a-a655-e2f82481dfae')"
+      <button class="colab-df-convert" onclick="convertToInteractive('df-fb0b9d50-e63f-4c2b-b9fe-b0b15eb3ad5b')"
               title="Convert this dataframe to an interactive table."
               style="display:none;">
 
@@ -612,12 +594,12 @@ training_outputs.head()
 
       <script>
         const buttonEl =
-          document.querySelector('#df-39e06d30-d348-412a-a655-e2f82481dfae button.colab-df-convert');
+          document.querySelector('#df-fb0b9d50-e63f-4c2b-b9fe-b0b15eb3ad5b button.colab-df-convert');
         buttonEl.style.display =
           google.colab.kernel.accessAllowed ? 'block' : 'none';
 
         async function convertToInteractive(key) {
-          const element = document.querySelector('#df-39e06d30-d348-412a-a655-e2f82481dfae');
+          const element = document.querySelector('#df-fb0b9d50-e63f-4c2b-b9fe-b0b15eb3ad5b');
           const dataTable =
             await google.colab.kernel.invokeFunction('convertToInteractive',
                                                      [key], {});
@@ -655,6 +637,19 @@ x_train, x_valid, y_train, y_valid = train_test_split(
     test_size=val_factor, random_state=0)
 ```
 
+
+```python
+num_outputs: int = int(y_train.shape[1])
+num_outputs
+```
+
+
+
+
+    37
+
+
+
 Here `x_{train|test}` holds Galaxy IDs that correspond to image file names and `y_{train|test}` holds outputs for each image. Let us now create tensors for the IDs.
 
 
@@ -663,13 +658,15 @@ train_id_ds: Dataset = tf.data.Dataset.from_tensor_slices(x_train)
 valid_id_ds: Dataset = tf.data.Dataset.from_tensor_slices(x_valid)
 ```
 
-Now, let us define a function to load the images. Along with it, let us define the desired dimensions of the image to be used for training the model and the number of images to process in each batch.
+Now, let us define a function to load the images. As TensorFlow's `ResNet50` model was trained of images of size *224 x 224 x 3`, we modify the image height and width accordingly. 
+
+Along with it, let us define the desired dimensions of the image to be used for training the model and the number of images to process in each batch.
 
 
 ```python
 batch_size: int = 32
-img_height: int = 180
-img_width: int = 180
+img_height: int = 224  # 180
+img_width: int = 224  # 180
 ```
 
 
@@ -727,7 +724,7 @@ for image, output in train_ds.take(1):
     print("Label: ", output.numpy())
 ```
 
-    Image shape:  (180, 180, 3)
+    Image shape:  (224, 224, 3)
     Label:  [0.393467   0.53702    0.069513   0.         0.53702    0.
      0.53702    0.37311667 0.16390334 0.11397068 0.24111661 0.0207236
      0.1612091  0.595436   0.404564   0.02983227 0.36363474 0.
@@ -775,19 +772,199 @@ for i in range(1):
     plt.axis("off")
 ```
 
-    Output: [0.19925600290298462, 0.7954260110855103, 0.005317999981343746, 0.049299709498882294, 0.7461262941360474, 0.1809251755475998, 0.5652011036872864, 0.5864366292953491, 0.15968967974185944, 0.24056081473827362, 0.4147723615169525, 0.09079312533140182, 0.0, 0.3907339870929718, 0.6092659831047058, 0.010115829296410084, 0.1355980932712555, 0.05354208126664162, 0.0, 0.0, 0.03089885413646698, 0.3105534315109253, 0.04928171634674072, 0.0, 0.0, 0.049299709498882294, 0.0, 0.0, 0.2513297200202942, 0.1675531566143036, 0.1675531566143036, 0.0, 0.2513297200202942, 0.0837765783071518, 0.0, 0.0, 0.2513297200202942]
+
+    ---------------------------------------------------------------------------
+
+    KeyboardInterrupt                         Traceback (most recent call last)
+
+    <ipython-input-25-05ae24809b3a> in <module>
+    ----> 1 image_batch, label_batch = next(iter(train_ds))
+          2 
+          3 
+          4 plt.figure(figsize=(10, 10))
+          5 for i in range(1):
+
+
+    /usr/local/lib/python3.7/dist-packages/tensorflow/python/data/ops/iterator_ops.py in __next__(self)
+        834   def __next__(self):
+        835     try:
+    --> 836       return self._next_internal()
+        837     except errors.OutOfRangeError:
+        838       raise StopIteration
+
+
+    /usr/local/lib/python3.7/dist-packages/tensorflow/python/data/ops/iterator_ops.py in _next_internal(self)
+        820           self._iterator_resource,
+        821           output_types=self._flat_output_types,
+    --> 822           output_shapes=self._flat_output_shapes)
+        823 
+        824       try:
+
+
+    /usr/local/lib/python3.7/dist-packages/tensorflow/python/ops/gen_dataset_ops.py in iterator_get_next(iterator, output_types, output_shapes, name)
+       2918       _result = pywrap_tfe.TFE_Py_FastPathExecute(
+       2919         _ctx, "IteratorGetNext", name, iterator, "output_types", output_types,
+    -> 2920         "output_shapes", output_shapes)
+       2921       return _result
+       2922     except _core._NotOkStatusException as e:
+
+
+    KeyboardInterrupt: 
+
+
+## Step 2: Train model
+
+Having loaded the data, let us now define a neural network and train it for the data. In our [fastai notebook](https://colab.research.google.com/drive/1i6ghXgyQPcyLn5Q9-c7QbIsMEpY4vqQQ), we used the `ResNet18` model but the same model is not easily available in TensorFlow. Instead, we will use the `ResNet50` model. Both are neural networks consisting of *residual units* in the hidden layers. The main difference between them is that `ResNet18` consists of 18 layers while `ResNet50` consists of 50 layers.
+
+TensorFlow provides a service called [TensorFlow Hub](https://tfhub.dev/) which allows us to easily download models pretrained on a larger dataset. By downloading the *feature vector* version of model (also called the *headless version*), we get the entire pretrained except for the output layer. We can thus use this layer and attach an output layer and/or other layers in between to train our model.
+
+To fetch the feature vector, we first search for the required model on TensorFlow Hub and then copy the URL provided for downloading the features.
+
+
+```python
+resnet_50_url: str = "https://tfhub.dev/tensorflow/resnet_50/feature_vector/1"
+
+feature_extractor_model: str = resnet_50_url
+```
+
+Next, we wrap the feature extractor in a Keras layer using `hub.KerasLayer()`. While doing so, we specify the dimensions of our images and set the `trainable` attribute to `False` to prevent model training from affecting features in this pretrained model.
+
+
+```python
+feature_extractor_layer: hub.KerasLayer = hub.KerasLayer(
+    feature_extractor_model,
+    input_shape=(img_height, img_width, 3),
+    trainable=False
+)
+```
+
+Let us get a batch of training images from our dataset. A batch consists of 32 images of dimensions *224 x 224 x 3*.
+
+
+```python
+image_batch: tf.Tensor
+labels_batch: tf.Tensor
+for image_batch, labels_batch in train_ds:
+    print(image_batch.shape)
+    print(labels_batch.shape)
+    break
+```
+
+    (32, 224, 224, 3)
+    (32, 37)
+
+
+Let us now pass this batch through the feature extractor layer to understand the structure of its output. We see that, for each image, the output of the layer consists of 2048 values.
+
+
+```python
+feature_batch: tf.Tensor = feature_extractor_layer(image_batch)
+print(feature_batch.shape)
+```
+
+    (32, 2048)
+
+
+We know that each of our images has a list of 37 real values as outputs. So, let us create a simple network by attaching a fully-connected layer of 37 hidden units to the feature extractor layer.
+
+
+```python
+num_outputs
+```
 
 
 
-    
-![png](/Users/tejaskale/Code/fastai-with-astronomy/md/galaxy_zoo_tf_tpu_39_1.png)
-    
 
+    38
+
+
+
+
+```python
+model: Sequential = tf.keras.Sequential([
+    feature_extractor_layer,
+    tf.keras.layers.Dense(num_outputs)
+])
+
+model.summary()
+```
+
+    Model: "sequential_4"
+    _________________________________________________________________
+     Layer (type)                Output Shape              Param #   
+    =================================================================
+     keras_layer_1 (KerasLayer)  (None, 2048)              23561152  
+                                                                     
+     dense_4 (Dense)             (None, 37)                75813     
+                                                                     
+    =================================================================
+    Total params: 23,636,965
+    Trainable params: 75,813
+    Non-trainable params: 23,561,152
+    _________________________________________________________________
+
+
+Before we train the model, let us generate predictions from it. The predictions themselves will be meaningless but we can ensure that our code from data loading to model prediction is working fine. Once again, we predict on a batch of images and see that the result is a `Tensor` with 37 outputs for each image.
+
+
+```python
+predictions_to_test: tf.Tensor = model(image_batch)
+predictions_to_test.shape
+```
+
+
+
+
+    TensorShape([32, 37])
+
+
+
+Before we initiate training, let us first compile our model. We will use the *Adam* optimiser, *Mean Absolute Error* as the loss function, and the *Root Mean Squared Error* to use as the metric.
+
+
+```python
+model.compile(
+    optimizer=tf.keras.optimizers.Adam(),
+    loss=tf.keras.losses.MeanAbsoluteError(),
+    metrics=[tf.keras.metrics.RootMeanSquaredError()]
+)
+```
+
+Let us now define a TensorBoard callback to automatically capture loss and metric values during model training and show them in TensorBoard.
+
+
+```python
+log_dir = f"logs/fit/{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+tensorboard_callback = tf.keras.callbacks.TensorBoard(
+    log_dir=log_dir,
+    histogram_freq=1)  # Enable histogram computation for every epoch.
+```
+
+Finally, let us fit the model by specifying the training and validation datasets and fitting the model for 10 epochs.
+
+
+```python
+NUM_EPOCHS: int = 10
+
+history: dict = model.fit(train_ds,
+                          validation_data=val_ds,
+                          epochs=NUM_EPOCHS,
+                          callbacks=tensorboard_callback)
+```
+
+    Epoch 1/10
+      59/1540 [>.............................] - ETA: 6:08:11 - loss: 45.4240 - root_mean_squared_error: 88.3485
+
+
+```python
+%tensorboard --logdir logs/fit
+```
 
 ## References
 - [Load and preprocess images: Using tf.data for finer control](https://www.tensorflow.org/tutorials/load_data/images#using_tfdata_for_finer_control)
 - [Get string value from a tensor in `Dataset.map()`](https://stackoverflow.com/questions/56122670/how-to-get-string-value-out-of-tf-tensor-which-dtype-is-string)
 - [galaxy_zoo_Xception](https://www.kaggle.com/code/hironobukawaguchi/galaxy-zoo-xception)
+- [Transfer learning with TensorFlow Hub](https://www.tensorflow.org/tutorials/images/transfer_learning_with_hub#download_the_headless_model)
 
 
 ```python
